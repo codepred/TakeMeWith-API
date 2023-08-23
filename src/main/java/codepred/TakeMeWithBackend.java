@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import codepred.user.service.UserService;
+import codepred.customer.service.UserService;
 
 @SpringBootApplication
 @RequiredArgsConstructor

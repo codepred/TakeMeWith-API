@@ -1,10 +1,10 @@
-package codepred.user.dto;
+package codepred.customer.dto;
 
 import java.util.List;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import codepred.user.model.AppUserRole;
+import codepred.customer.model.AppUserRole;
 
 @Data
 public class UserResponseDTO {

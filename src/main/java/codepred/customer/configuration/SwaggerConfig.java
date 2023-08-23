@@ -1,4 +1,4 @@
-package codepred.user.configuration;
+package codepred.customer.configuration;
 
 import java.util.Arrays;
 import java.util.Collections;

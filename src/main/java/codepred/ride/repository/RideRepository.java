@@ -1,8 +1,6 @@
 package codepred.ride.repository;
 
-import codepred.driver.model.DriverEntity;
 import codepred.ride.model.RideEntity;
-import codepred.user.model.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

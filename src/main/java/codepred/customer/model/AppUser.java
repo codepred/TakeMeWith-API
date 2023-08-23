@@ -1,5 +1,6 @@
-package codepred.user.model;
+package codepred.customer.model;
 
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
+@Table(name = "USERS")
 @Entity
 @Data // Create getters and setters
 @NoArgsConstructor
@@ -39,10 +41,6 @@ public class AppUser {
   @Column(unique = true, nullable = false)
   private String password;
 
-//  @ElementCollection(fetch = FetchType.EAGER)
-//  @Column(name = "app_user_app_user_roles")
-//  List<AppUserRole> appUserRoles;
-
   @Column(name = "is_active")
   private boolean isActive;
 
@@ -50,8 +48,7 @@ public class AppUser {
   private String  verificationCode;
 
   @ElementCollection(fetch = FetchType.EAGER)
+  @Column(name = "app_user_app_user_roles")
   List<AppUserRole> appUserRoles;
-
-
 
 }

@@ -4,18 +4,16 @@ package codepred.driver.controller;
 import codepred.driver.dto.DriverRequest;
 import codepred.driver.model.DriverEntity;
 import codepred.driver.service.DriverService;
-import codepred.user.dto.ResponseObj;
-import codepred.user.dto.Status;
-import codepred.user.dto.UserResponseDTO;
-import codepred.user.model.AppUser;
-import codepred.user.model.AppUserRole;
-import codepred.user.service.UserService;
+import codepred.customer.dto.ResponseObj;
+import codepred.customer.dto.Status;
+import codepred.customer.dto.UserResponseDTO;
+import codepred.customer.model.AppUserRole;
+import codepred.customer.service.UserService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +57,6 @@ public class DriverController {
             responseObj.setMessage("DRIVER_ACCOUNT_ALREADY_ADDED");
             return ResponseEntity.status(400).body(responseObj);
         }
-
 
         userService.addUserRole(appUser.getPhone(), AppUserRole.ROLE_DRIVER);
         DriverEntity driverEntity = driverService.addDriver(driverRequest, appUser.getPhone());

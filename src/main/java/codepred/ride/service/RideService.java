@@ -8,9 +8,9 @@ import codepred.ride.dto.RideRequest;
 import codepred.ride.model.Point;
 import codepred.ride.model.RideEntity;
 import codepred.ride.repository.RideRepository;
-import codepred.user.model.AppUser;
-import codepred.user.model.AppUserRole;
-import codepred.user.service.UserService;
+import codepred.customer.model.AppUser;
+import codepred.customer.model.AppUserRole;
+import codepred.customer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

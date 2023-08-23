@@ -1,20 +1,19 @@
 package codepred.ride.controller;
 
 
-import codepred.passenger.model.PassengerEntity;
 import codepred.passenger.service.PassengerService;
 import codepred.ride.dto.Pagination;
 import codepred.ride.dto.RideRequest;
 import codepred.ride.model.RideEntity;
 import codepred.ride.service.RideService;
-import codepred.user.dto.ResponseObj;
-import codepred.user.dto.Status;
-import codepred.user.dto.UserResponseDTO;
-import codepred.user.model.AppUserRole;
-import codepred.user.service.UserService;
+import codepred.customer.dto.ResponseObj;
+import codepred.customer.dto.Status;
+import codepred.customer.dto.UserResponseDTO;
+import codepred.customer.service.UserService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -44,11 +43,11 @@ public class RideController {
             @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
     public ResponseEntity<Object> addRide(HttpServletRequest req, @RequestBody RideRequest rideRequest) {
         UserResponseDTO appUser = modelMapper.map(userService.whoami(req), UserResponseDTO.class);
-        ResponseObj responseObj = new ResponseObj();
+        ResponseObj responseObj = new ResponseObj(Status.BAD_REQUEST,"User is already registered",null);
         if(appUser == null){
             responseObj.setCode(Status.BAD_REQUEST);
             responseObj.setMessage("USER_NOT_FOUND");
-            return ResponseEntity.status(400).body(responseObj);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObj);
         }
         RideEntity ride = rideService.addRide(appUser.getPhone(),rideRequest);
         responseObj.setCode(Status.ACCEPTED);

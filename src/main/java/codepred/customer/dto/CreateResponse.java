@@ -1,4 +1,4 @@
-package codepred.user.dto;
+package codepred.customer.dto;
 
 
 import lombok.Data;

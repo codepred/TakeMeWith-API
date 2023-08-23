@@ -1,13 +1,13 @@
-package codepred.user.security;
+package codepred.customer.security;
 
 import lombok.RequiredArgsConstructor;
-import codepred.user.model.AppUser;
+import codepred.customer.model.AppUser;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import codepred.user.repository.UserRepository;
+import codepred.customer.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

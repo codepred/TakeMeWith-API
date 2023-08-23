@@ -1,4 +1,4 @@
-package codepred.user.model;
+package codepred.customer.model;
 
 import org.springframework.security.core.GrantedAuthority;
 

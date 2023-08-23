@@ -1,4 +1,4 @@
-package codepred.user.exception;
+package codepred.customer.exception;
 
 import org.springframework.http.HttpStatus;
 

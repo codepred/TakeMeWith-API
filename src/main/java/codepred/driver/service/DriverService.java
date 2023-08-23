@@ -3,9 +3,9 @@ package codepred.driver.service;
 import codepred.driver.dto.DriverRequest;
 import codepred.driver.model.DriverEntity;
 import codepred.driver.repository.DriverRepository;
-import codepred.user.model.AppUser;
-import codepred.user.repository.UserRepository;
-import codepred.user.service.UserService;
+import codepred.customer.model.AppUser;
+import codepred.customer.repository.UserRepository;
+import codepred.customer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

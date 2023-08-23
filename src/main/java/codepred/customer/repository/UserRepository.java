@@ -1,10 +1,10 @@
-package codepred.user.repository;
+package codepred.customer.repository;
 
 import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import codepred.user.model.AppUser;
+import codepred.customer.model.AppUser;
 
 public interface UserRepository extends JpaRepository<AppUser, Integer> {
 

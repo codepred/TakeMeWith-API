@@ -2,7 +2,7 @@ package codepred.ride.model;
 
 import codepred.driver.model.DriverEntity;
 import codepred.passenger.model.PassengerEntity;
-import codepred.user.model.AppUserRole;
+import codepred.customer.model.AppUserRole;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;

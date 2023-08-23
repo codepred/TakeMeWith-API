@@ -1,6 +1,6 @@
 package codepred.driver.model;
 
-import codepred.user.model.AppUser;
+import codepred.customer.model.AppUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

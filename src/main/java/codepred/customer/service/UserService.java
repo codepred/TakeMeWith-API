@@ -1,41 +1,37 @@
-package codepred.user.service;
+package codepred.customer.service;
 
+import codepred.customer.dto.SignInRequest;
+import codepred.customer.dto.SignUpRequest;
+import codepred.customer.dto.VerifyUserRequest;
+import codepred.user.security.JwtTokenProvider;
 import javax.servlet.http.HttpServletRequest;
 
 import codepred.driver.model.DriverEntity;
 import codepred.driver.repository.DriverRepository;
-import codepred.passenger.model.PassengerData;
 import codepred.passenger.model.PassengerEntity;
 import codepred.passenger.repository.PassengerRepository;
-import codepred.user.dto.CreateResponse;
-import codepred.user.dto.CreateStatus;
-import codepred.user.dto.ResponseObj;
-import codepred.user.dto.Status;
-import codepred.user.model.AppUserRole;
+import codepred.customer.dto.CreateStatus;
+import codepred.customer.dto.ResponseObj;
+import codepred.customer.dto.Status;
+import codepred.customer.model.AppUserRole;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import codepred.user.exception.CustomException;
-import codepred.user.model.AppUser;
-import codepred.user.repository.UserRepository;
-import codepred.user.security.JwtTokenProvider;
+import codepred.customer.model.AppUser;
+import codepred.customer.repository.UserRepository;
 import codepred.sms.SmsService;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Collections;
-
-import static codepred.user.dto.CreateStatus.*;
+import static codepred.customer.dto.CreateStatus.*;
+import static codepred.customer.dto.Status.BAD_REQUEST;
+import static codepred.customer.dto.Status.UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
@@ -54,57 +50,78 @@ public class UserService {
     @Autowired
     DriverRepository driverRepository;
 
-    public ResponseObj signin(String phone) {
-        AppUser appUser = userRepository.findByPhone(phone);
-        if (appUser == null) {
-            appUser = createNewUser(phone);
+    public ResponseObj signin(SignInRequest signInRequest) {
+        AppUser appUser = userRepository.findByPhone(signInRequest.phoneNumber());
+        if(appUser == null){
+            return new ResponseObj(BAD_REQUEST,"USER_NOT_EXISTS",null);
         }
 
-        String code = smsService.sendSms(phone);
-        appUser.setPassword(passwordEncoder.encode(code));
-        appUser.setVerificationCode(code);
-        userRepository.save(appUser);
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.phoneNumber(),
+                                                                                       signInRequest.password()));
+        } catch (Exception e){
+            return new ResponseObj(UNAUTHORIZED,"WRONG_DATA",null);
+        }
 
         ResponseObj responseObj = new ResponseObj();
         responseObj.setCode(Status.ACCEPTED);
-        responseObj.setMessage("SMS_WITH_VERIFICATION_CODE_WAS_SENT");
+        responseObj.setMessage("CORRECT_LOGIN_DATA");
+        responseObj.setToken(jwtTokenProvider.createToken(signInRequest.phoneNumber(),
+                                                          userRepository.findByPhone(signInRequest.phoneNumber())
+                                                              .getAppUserRoles()));
         return responseObj;
     }
 
-    public AppUser createNewUser(String phone) {
+    @Transactional
+    public AppUser createNewUser(SignUpRequest signUpRequest) {
         AppUser appUser = new AppUser();
-        appUser.setPhone(phone);
+        appUser.setPhone(signUpRequest.phoneNumber());
         appUser.setActive(false);
-        appUser.setFirstName("not active");
-        appUser.setLastName("not active");
+        appUser.setFirstName(signUpRequest.name());
+        appUser.setLastName(signUpRequest.lastname());
         List<AppUserRole> list = new ArrayList<>();
         list.add(AppUserRole.ROLE_NONE);
         appUser.setAppUserRoles(list);
+        String code = smsService.sendSms(signUpRequest.phoneNumber());
+        appUser.setPassword(passwordEncoder.encode(code));
+        appUser.setVerificationCode(code);
+        userRepository.save(appUser);
         return appUser;
     }
 
-    public ResponseObj verifyCode(String phone, String password) {
+    public Integer getResponseCode(Status code){
+        if(code.equals(Status.ACCEPTED)){
+            return 200;
+        }
+        else if(code.equals(Status.BAD_REQUEST)){
+            return 400;
+        }
+        return 500;
+    }
+
+    public ResponseObj verifyCode(VerifyUserRequest verifyUserRequest) {
         ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhone(phone);
+        AppUser appUser = userRepository.findByPhone(verifyUserRequest.phoneNumber());
         // CASE 0: SMS WAS NOT SENT TO PHONE NUMBER
         if (appUser == null || appUser.getVerificationCode() == null) {
-            responseObj.setMessage(CreateStatus.SMS_WAS_NOT_SENT.toString());
+            responseObj.setMessage(CreateStatus.INVALID_CODE.toString());
             responseObj.setCode(Status.BAD_REQUEST);
             return responseObj;
         }
         // CASE 1: SMS WAS SEND BUT CODE IS NOT CORRECT
         String verificationCode = appUser.getVerificationCode();
-        if (!verificationCode.equals(password)) {
-            responseObj.setMessage(WRONG_CODE.toString());
+        if (!verificationCode.equals(verifyUserRequest.code())) {
+            responseObj.setMessage(INVALID_CODE.toString());
             responseObj.setCode(Status.BAD_REQUEST);
             return responseObj;
         }
 
         // CASE 2: SMS WAS SEND AND CODE IS CORRECT
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phone, password));
         responseObj.setCode(Status.ACCEPTED);
-        responseObj.setMessage("CODE_WAS_CORRECT");
-        responseObj.setToken(jwtTokenProvider.createToken(phone, userRepository.findByPhone(phone).getAppUserRoles()));
+        responseObj.setMessage(REGISTRATION_CONFIRMED.toString());
+        responseObj.setToken(jwtTokenProvider.createToken(verifyUserRequest.phoneNumber(),
+                                                          userRepository.findByPhone(verifyUserRequest.phoneNumber())
+                                                              .getAppUserRoles()));
         // activate user (only registration)
         if (!appUser.isActive()) {
             appUser.setActive(true);

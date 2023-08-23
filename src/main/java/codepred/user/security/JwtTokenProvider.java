@@ -1,5 +1,8 @@
 package codepred.user.security;
 
+import codepred.customer.exception.CustomException;
+import codepred.customer.model.AppUserRole;
+import codepred.customer.security.MyUserDetails;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +12,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import codepred.user.model.AppUserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import codepred.user.exception.CustomException;
 
 @Component
 public class JwtTokenProvider {

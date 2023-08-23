@@ -1,9 +1,7 @@
 package codepred.passenger.repository;
 
 
-import codepred.driver.model.DriverEntity;
 import codepred.passenger.model.PassengerEntity;
-import codepred.user.model.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
