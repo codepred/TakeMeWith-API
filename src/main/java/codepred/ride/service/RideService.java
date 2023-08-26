@@ -1,24 +1,16 @@
 package codepred.ride.service;
 
-import codepred.driver.model.DriverEntity;
-import codepred.driver.service.DriverService;
-import codepred.passenger.model.PassengerEntity;
-import codepred.passenger.service.PassengerService;
-import codepred.ride.dto.RideRequest;
-import codepred.ride.model.Point;
+import codepred.customer.model.AppUser;
+import codepred.ride.dto.RideDataRequest;
+import codepred.ride.dto.RideResponse;
+import codepred.ride.dto.SubmitRideRequest;
 import codepred.ride.model.RideEntity;
 import codepred.ride.repository.RideRepository;
-import codepred.customer.model.AppUser;
-import codepred.customer.model.AppUserRole;
 import codepred.customer.service.UserService;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,56 +20,31 @@ public class RideService {
     UserService userService;
 
     @Autowired
-    DriverService driverService;
-
-    @Autowired
-    PassengerService passengerService;
-
-    @Autowired
     RideRepository rideRepository;
 
-    public RideEntity addRide(String phone, RideRequest rideRequest){
-        AppUser appUser = userService.getUserByPhone(phone);
-        DriverEntity driverEntity = null;
-        PassengerEntity passengerEntity = null;
-        if(appUser.getAppUserRoles().contains(AppUserRole.ROLE_DRIVER)){
-            driverEntity = driverService.getDriver(appUser);
-        }
-        if(appUser.getAppUserRoles().contains(AppUserRole.ROLE_PASSENGER)){
-            passengerEntity = passengerService.getPassenger(appUser);
-        }
+    public RideEntity submitRide(SubmitRideRequest submitRideRequest, AppUser appUser) {
         RideEntity rideEntity = new RideEntity();
-        rideEntity.setDriverEntity(driverEntity);
-        rideEntity.setPassengerEntity(passengerEntity);
-        rideEntity.setStartPoint(rideRequest.getStartPoint());
-        rideEntity.setEndPoint(rideRequest.getEndPoint());
-        rideEntity.setStartDate(rideRequest.getStartDate().replace("T", " "));
-        // TO DO - edit calculate point function
-        Point point = calculatePoint(rideRequest.getStartPoint(),rideRequest.getEndPoint());
-        rideEntity.setPoint(point);
-        rideEntity.setNumberOfSeats(rideRequest.getNumberOfSeats());
-        rideEntity.setCreatedAt(new Date());
-        rideEntity.setType(appUser.getAppUserRoles().get(1));
+        rideEntity.setAppUser(appUser);
+
+        rideEntity.setStart(submitRideRequest.start());
+        rideEntity.setDestination(submitRideRequest.destination());
+        rideEntity.setStartDate(submitRideRequest.startDate());
+        rideEntity.setStartHour(submitRideRequest.startHour());
         return rideRepository.save(rideEntity);
     }
 
-
-    public Point calculatePoint(String startPoint, String endPoint){
-        return new Point();
-    }
-
-    public List<RideEntity> getAllRides(){
-        return rideRepository.findAll();
-    }
-
-
-    public Page<RideEntity> getRideList(int pageNumber){
-        Pageable pageable = PageRequest.of(pageNumber,20);
-        Page<RideEntity> page = rideRepository.getAllMain(pageable);
-        return page;
-    }
-
-    public void deleteALl(){
-        rideRepository.deleteAll();;
+    public List<RideResponse> getRideList(RideDataRequest rideDataRequest) {
+        List<RideEntity> rideEntities = rideRepository.findAll();
+        return rideEntities.stream()
+            .map(r -> new RideResponse(r.getId(),
+                                       r.getStart(),
+                                       r.getDestination(),
+                                       r.getStartDate(),
+                                       r.getStartHour(),
+                                       r.getAppUser().getName(),
+                                       r.getAppUser().getPhoneNumber(),
+                                       "photo",
+                                       10))
+            .collect(Collectors.toList());
     }
 }

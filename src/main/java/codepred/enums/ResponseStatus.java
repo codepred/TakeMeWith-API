@@ -1,6 +1,6 @@
-package codepred.customer.dto;
+package codepred.enums;
 
-public enum Status {
+public enum ResponseStatus {
 
     ACCEPTED,
     BAD_REQUEST,

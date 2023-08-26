@@ -8,11 +8,11 @@ import codepred.customer.model.AppUser;
 
 public interface UserRepository extends JpaRepository<AppUser, Integer> {
 
-  boolean existsByPhone(String phone);
+  boolean existsByPhoneNumber(String phone);
 
-  AppUser findByPhone(String phone);
+  AppUser findByPhoneNumber(String phone);
 
   @Transactional
-  void deleteByPhone(String phone);
+  void deleteByPhoneNumber(String phone);
 
 }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>murraco</groupId>
-	<artifactId>jwt-auth-service</artifactId>
+	<artifactId>takemewith</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 

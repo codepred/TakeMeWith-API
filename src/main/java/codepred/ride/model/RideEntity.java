@@ -1,8 +1,7 @@
 package codepred.ride.model;
 
-import codepred.driver.model.DriverEntity;
-import codepred.passenger.model.PassengerEntity;
-import codepred.customer.model.AppUserRole;
+import codepred.customer.model.AppUser;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,21 +23,14 @@ public class RideEntity {
     private Date createdAt;
 
     @ManyToOne
-    private DriverEntity driverEntity;
+    private AppUser appUser;
 
-    @ManyToOne
-    private PassengerEntity passengerEntity;
+    private String start;
 
-    private String startPoint;
+    private String destination;
 
-    private String startDate;
+    private LocalDate startDate;
 
-    private String endPoint;
-
-    private Point point;
-
-    private int numberOfSeats;
-
-    private AppUserRole type;
+    private String startHour;
 
 }

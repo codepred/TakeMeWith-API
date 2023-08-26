@@ -1,16 +1,14 @@
 package codepred.customer.controller;
 
+import codepred.customer.dto.NewPasswordRequest;
+import codepred.customer.dto.PhoneNumberRequest;
 import codepred.customer.dto.ResponseObj;
 import codepred.customer.dto.SignInRequest;
 import codepred.customer.dto.SignUpRequest;
-import codepred.customer.dto.Status;
+import codepred.enums.ResponseStatus;
 import codepred.customer.dto.VerifyUserRequest;
-import io.swagger.annotations.ApiModel;
 import javax.servlet.http.HttpServletRequest;
 
-import codepred.driver.repository.DriverRepository;
-import codepred.passenger.repository.PassengerRepository;
-import codepred.customer.dto.UserVerifyDto;
 import codepred.customer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
@@ -39,12 +36,6 @@ public class CustomerController {
     private final ModelMapper modelMapper;
 
     @Autowired
-    PassengerRepository passengerRepository;
-
-    @Autowired
-    DriverRepository driverRepository;
-
-    @Autowired
     UserRepository userRepository;
 
     @PostMapping("/sign-up")
@@ -53,12 +44,11 @@ public class CustomerController {
         @ApiResponse(code = 400, message = "Something went wrong"), //
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> register(@RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByPhone(signUpRequest.phoneNumber())) {
-            return ResponseEntity.status(400)
-                .body(new ResponseObj(Status.BAD_REQUEST, "PHONE_NUMBER_IS_TAKEN", null));
+        if (userRepository.existsByPhoneNumber(signUpRequest.phoneNumber())) {
+            return ResponseEntity.status(400).body(new ResponseObj(ResponseStatus.BAD_REQUEST, "PHONE_NUMBER_IS_TAKEN", null));
         }
         userService.createNewUser(signUpRequest);
-        return ResponseEntity.status(200).body(new ResponseObj(Status.ACCEPTED, "DATA_SUCCESFULY_ADDED", null));
+        return ResponseEntity.status(200).body(new ResponseObj(ResponseStatus.ACCEPTED, "DATA_SUCCESFULY_ADDED", null));
     }
 
     @PostMapping("/sign-in")
@@ -67,7 +57,8 @@ public class CustomerController {
         @ApiResponse(code = 400, message = "Something went wrong"), //
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> login(@RequestBody SignInRequest signUpRequest) {
-        return ResponseEntity.status(200).body(userService.signin(signUpRequest));
+        ResponseObj responseObj = userService.signin(signUpRequest);
+        return ResponseEntity.status(userService.getResponseCode(responseObj.getCode())).body(responseObj);
     }
 
     @PostMapping("/verify-user")
@@ -81,7 +72,29 @@ public class CustomerController {
         return ResponseEntity.status(userService.getResponseCode(responseObj.getCode())).body(responseObj);
     }
 
-    @GetMapping(value = "/me")
+    @PostMapping("/request-new-password")
+    @ApiOperation(value = "${UserController.verifyCode}")
+    @ApiResponses(value = {//
+        @ApiResponse(code = 400, message = "Something went wrong"), //
+        @ApiResponse(code = 403, message = "Access denied"), //
+        @ApiResponse(code = 422, message = "Invalid username/password supplied")})
+    public ResponseEntity<Object> requestNewPassword(@RequestBody PhoneNumberRequest phoneNumberRequest) {
+        ResponseObj responseObj = userService.requestNewPassword(phoneNumberRequest);
+        return ResponseEntity.status(userService.getResponseCode(responseObj.getCode())).body(responseObj);
+    }
+
+    @PostMapping("/set-new-password")
+    @ApiOperation(value = "${UserController.verifyCode}")
+    @ApiResponses(value = {//
+        @ApiResponse(code = 400, message = "Something went wrong"), //
+        @ApiResponse(code = 403, message = "Access denied"), //
+        @ApiResponse(code = 422, message = "Invalid username/password supplied")})
+    public ResponseEntity<Object> setNewPassword(@RequestBody NewPasswordRequest newPasswordRequest) {
+        ResponseObj responseObj = userService.setNewPassword(newPasswordRequest);
+        return ResponseEntity.status(userService.getResponseCode(responseObj.getCode())).body(responseObj);
+    }
+
+    @GetMapping(value = "/get-user-data")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_NONE')")
     @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = {
         @Authorization(value = "apiKey")})
@@ -92,6 +105,5 @@ public class CustomerController {
     public UserResponseDTO whoami(HttpServletRequest req) {
         return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
     }
-
 
 }

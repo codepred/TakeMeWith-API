@@ -1,22 +1,18 @@
 package codepred.customer.service;
 
+import codepred.customer.dto.NewPasswordRequest;
+import codepred.customer.dto.PhoneNumberRequest;
 import codepred.customer.dto.SignInRequest;
 import codepred.customer.dto.SignUpRequest;
 import codepred.customer.dto.VerifyUserRequest;
-import codepred.user.security.JwtTokenProvider;
+import codepred.security.JwtTokenProvider;
 import javax.servlet.http.HttpServletRequest;
 
-import codepred.driver.model.DriverEntity;
-import codepred.driver.repository.DriverRepository;
-import codepred.passenger.model.PassengerEntity;
-import codepred.passenger.repository.PassengerRepository;
-import codepred.customer.dto.CreateStatus;
 import codepred.customer.dto.ResponseObj;
-import codepred.customer.dto.Status;
+import codepred.enums.ResponseStatus;
 import codepred.customer.model.AppUserRole;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,9 +25,8 @@ import codepred.customer.model.AppUser;
 import codepred.customer.repository.UserRepository;
 import codepred.sms.SmsService;
 
-import static codepred.customer.dto.CreateStatus.*;
-import static codepred.customer.dto.Status.BAD_REQUEST;
-import static codepred.customer.dto.Status.UNAUTHORIZED;
+import static codepred.enums.ResponseStatus.BAD_REQUEST;
+import static codepred.enums.ResponseStatus.UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
@@ -44,30 +39,25 @@ public class UserService {
 
     private final SmsService smsService;
 
-    @Autowired
-    PassengerRepository passengerRepository;
-
-    @Autowired
-    DriverRepository driverRepository;
-
+    @Transactional
     public ResponseObj signin(SignInRequest signInRequest) {
-        AppUser appUser = userRepository.findByPhone(signInRequest.phoneNumber());
-        if(appUser == null){
-            return new ResponseObj(BAD_REQUEST,"USER_NOT_EXISTS",null);
+        AppUser appUser = userRepository.findByPhoneNumber(signInRequest.phoneNumber());
+        if (appUser == null) {
+            return new ResponseObj(BAD_REQUEST, "USER_NOT_EXISTS", null);
         }
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.phoneNumber(),
                                                                                        signInRequest.password()));
-        } catch (Exception e){
-            return new ResponseObj(UNAUTHORIZED,"WRONG_DATA",null);
+        } catch (Exception e) {
+            return new ResponseObj(UNAUTHORIZED, "WRONG_DATA", null);
         }
 
         ResponseObj responseObj = new ResponseObj();
-        responseObj.setCode(Status.ACCEPTED);
+        responseObj.setCode(ResponseStatus.ACCEPTED);
         responseObj.setMessage("CORRECT_LOGIN_DATA");
         responseObj.setToken(jwtTokenProvider.createToken(signInRequest.phoneNumber(),
-                                                          userRepository.findByPhone(signInRequest.phoneNumber())
+                                                          userRepository.findByPhoneNumber(signInRequest.phoneNumber())
                                                               .getAppUserRoles()));
         return responseObj;
     }
@@ -75,52 +65,44 @@ public class UserService {
     @Transactional
     public AppUser createNewUser(SignUpRequest signUpRequest) {
         AppUser appUser = new AppUser();
-        appUser.setPhone(signUpRequest.phoneNumber());
+        appUser.setPhoneNumber(signUpRequest.phoneNumber());
         appUser.setActive(false);
-        appUser.setFirstName(signUpRequest.name());
+        appUser.setName(signUpRequest.name());
         appUser.setLastName(signUpRequest.lastname());
+        appUser.setEmail(signUpRequest.email());
         List<AppUserRole> list = new ArrayList<>();
         list.add(AppUserRole.ROLE_NONE);
         appUser.setAppUserRoles(list);
         String code = smsService.sendSms(signUpRequest.phoneNumber());
-        appUser.setPassword(passwordEncoder.encode(code));
+        appUser.setPassword(passwordEncoder.encode(signUpRequest.password()));
         appUser.setVerificationCode(code);
         userRepository.save(appUser);
         return appUser;
     }
 
-    public Integer getResponseCode(Status code){
-        if(code.equals(Status.ACCEPTED)){
-            return 200;
-        }
-        else if(code.equals(Status.BAD_REQUEST)){
-            return 400;
-        }
-        return 500;
-    }
-
+    @Transactional
     public ResponseObj verifyCode(VerifyUserRequest verifyUserRequest) {
         ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhone(verifyUserRequest.phoneNumber());
+        AppUser appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber());
         // CASE 0: SMS WAS NOT SENT TO PHONE NUMBER
         if (appUser == null || appUser.getVerificationCode() == null) {
-            responseObj.setMessage(CreateStatus.INVALID_CODE.toString());
-            responseObj.setCode(Status.BAD_REQUEST);
+            responseObj.setMessage("INVALID_CODE");
+            responseObj.setCode(ResponseStatus.BAD_REQUEST);
             return responseObj;
         }
         // CASE 1: SMS WAS SEND BUT CODE IS NOT CORRECT
         String verificationCode = appUser.getVerificationCode();
         if (!verificationCode.equals(verifyUserRequest.code())) {
-            responseObj.setMessage(INVALID_CODE.toString());
-            responseObj.setCode(Status.BAD_REQUEST);
+            responseObj.setMessage("INVALID_CODE");
+            responseObj.setCode(ResponseStatus.BAD_REQUEST);
             return responseObj;
         }
 
         // CASE 2: SMS WAS SEND AND CODE IS CORRECT
-        responseObj.setCode(Status.ACCEPTED);
-        responseObj.setMessage(REGISTRATION_CONFIRMED.toString());
+        responseObj.setCode(ResponseStatus.ACCEPTED);
+        responseObj.setMessage("REGISTRATION_CONFIRMED");
         responseObj.setToken(jwtTokenProvider.createToken(verifyUserRequest.phoneNumber(),
-                                                          userRepository.findByPhone(verifyUserRequest.phoneNumber())
+                                                          userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber())
                                                               .getAppUserRoles()));
         // activate user (only registration)
         if (!appUser.isActive()) {
@@ -132,55 +114,62 @@ public class UserService {
         return responseObj;
     }
 
-
-    public List<AppUser> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public void delete(String phone) {
-        AppUser appUser = getUserByPhone(phone);
-        PassengerEntity passengerEntity = passengerRepository.getByAppUser(appUser.getId());
-        DriverEntity driver = driverRepository.getByAppUser(appUser.getId());
-        if(driver != null)
-        driverRepository.delete(driver);
-        if(passengerEntity != null)
-        passengerRepository.delete(passengerEntity);
-        if(appUser != null)
-        userRepository.delete(appUser);
-    }
-
-
-    public void addUserRole(String phone, AppUserRole appUserRole) {
-        AppUser appUser = getUserByPhone(phone);
-        List<AppUserRole> list = appUser.getAppUserRoles();
-        list.add(appUserRole);
-        appUser.setAppUserRoles(list);
-        appUser.setFirstName("null");
-        appUser.setLastName("null");
-        userRepository.save(appUser);
-    }
-
-    public void setUserNames(AppUser appUser, String name, String lastName){
-        appUser.setFirstName(name);
-        appUser.setLastName(lastName);
-        userRepository.save(appUser);
-    }
-
-    public AppUser getUserByPhone(String phone) {
-        AppUser appUser = userRepository.findByPhone(phone);
-        if (appUser == null) {
-            return null;
-//      throw new CustomException("The user doesn't exist", HttpStatus.NOT_FOUND);
+    public ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
+        ResponseObj responseObj = new ResponseObj();
+        AppUser appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber());
+        if (appUser != null) {
+            String code = smsService.sendSms(phoneNumberRequest.phoneNumber());
+            appUser.setVerificationCode(code);
+            userRepository.save(appUser);
+            responseObj.setMessage("EMAIL_EXISTS");
+            responseObj.setCode(ResponseStatus.ACCEPTED);
+            return responseObj;
         }
-        return appUser;
+        responseObj.setMessage("INVALID_PHONE_NUMBER");
+        responseObj.setCode(BAD_REQUEST);
+        return responseObj;
+    }
+
+    public ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
+        ResponseObj responseObj = new ResponseObj();
+        AppUser appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber());
+        if (appUser != null) {
+            if (appUser.getVerificationCode() != null && appUser.getVerificationCode().equals(newPasswordRequest.code())) {
+                appUser.setPassword(passwordEncoder.encode(newPasswordRequest.password()));
+                appUser.setVerificationCode(null);
+                userRepository.save(appUser);
+                responseObj.setCode(ResponseStatus.ACCEPTED);
+                responseObj.setMessage("CORRECT_DATA");
+                return responseObj;
+            } else {
+                responseObj.setCode(BAD_REQUEST);
+                responseObj.setMessage("INVALID_CODE");
+                return responseObj;
+            }
+        }
+        responseObj.setMessage("INVALID_PHONE_NUMBER");
+        responseObj.setCode(BAD_REQUEST);
+        return responseObj;
+    }
+
+
+    public Integer getResponseCode(ResponseStatus code) {
+        if (code.equals(ResponseStatus.ACCEPTED)) {
+            return 200;
+        } else if (code.equals(ResponseStatus.BAD_REQUEST)) {
+            return 400;
+        } else if (code.equals(UNAUTHORIZED)) {
+            return 401;
+        }
+        return 500;
     }
 
     public AppUser whoami(HttpServletRequest req) {
-        return userRepository.findByPhone(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
+        return userRepository.findByPhoneNumber(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
     }
 
     public String refresh(String username) {
-        return jwtTokenProvider.createToken(username, userRepository.findByPhone(username).getAppUserRoles());
+        return jwtTokenProvider.createToken(username, userRepository.findByPhoneNumber(username).getAppUserRoles());
     }
 
 }

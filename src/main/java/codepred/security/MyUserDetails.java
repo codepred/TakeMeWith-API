@@ -1,4 +1,4 @@
-package codepred.customer.security;
+package codepred.security;
 
 import lombok.RequiredArgsConstructor;
 import codepred.customer.model.AppUser;
@@ -17,7 +17,7 @@ public class MyUserDetails implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    final AppUser appUser = userRepository.findByPhone(username);
+    final AppUser appUser = userRepository.findByPhoneNumber(username);
 
     if (appUser == null) {
       throw new UsernameNotFoundException("User '" + username + "' not found");

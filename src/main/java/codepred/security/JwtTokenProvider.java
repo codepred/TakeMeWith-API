@@ -1,8 +1,7 @@
-package codepred.user.security;
+package codepred.security;
 
-import codepred.customer.exception.CustomException;
 import codepred.customer.model.AppUserRole;
-import codepred.customer.security.MyUserDetails;
+import codepred.exception.CustomException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;

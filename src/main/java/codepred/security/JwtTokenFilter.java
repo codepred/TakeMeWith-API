@@ -1,6 +1,6 @@
-package codepred.user.security;
+package codepred.security;
 
-import codepred.customer.exception.CustomException;
+import codepred.exception.CustomException;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
