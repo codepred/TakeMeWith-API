@@ -6,6 +6,7 @@ import codepred.customer.dto.SignInRequest;
 import codepred.customer.dto.SignUpRequest;
 import codepred.customer.dto.VerifyUserRequest;
 import codepred.security.JwtTokenProvider;
+import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import codepred.customer.dto.ResponseObj;
@@ -41,7 +42,7 @@ public class UserService {
 
     @Transactional
     public ResponseObj signin(SignInRequest signInRequest) {
-        AppUser appUser = userRepository.findByPhoneNumber(signInRequest.phoneNumber());
+        AppUser appUser = userRepository.findByPhoneNumber(signInRequest.phoneNumber().toString());
         if (appUser == null) {
             return new ResponseObj(BAD_REQUEST, "USER_NOT_EXISTS", null);
         }
@@ -56,8 +57,8 @@ public class UserService {
         ResponseObj responseObj = new ResponseObj();
         responseObj.setCode(ResponseStatus.ACCEPTED);
         responseObj.setMessage("CORRECT_LOGIN_DATA");
-        responseObj.setToken(jwtTokenProvider.createToken(signInRequest.phoneNumber(),
-                                                          userRepository.findByPhoneNumber(signInRequest.phoneNumber())
+        responseObj.setToken(jwtTokenProvider.createToken(signInRequest.phoneNumber().toString(),
+                                                          userRepository.findByPhoneNumber(signInRequest.phoneNumber().toString())
                                                               .getAppUserRoles()));
         return responseObj;
     }
@@ -65,15 +66,16 @@ public class UserService {
     @Transactional
     public AppUser createNewUser(SignUpRequest signUpRequest) {
         AppUser appUser = new AppUser();
-        appUser.setPhoneNumber(signUpRequest.phoneNumber());
+        appUser.setPhoneNumber(signUpRequest.phoneNumber().toString());
         appUser.setActive(false);
         appUser.setName(signUpRequest.name());
         appUser.setLastName(signUpRequest.lastname());
         appUser.setEmail(signUpRequest.email());
         List<AppUserRole> list = new ArrayList<>();
         list.add(AppUserRole.ROLE_NONE);
+        appUser.setCreatedAt(new Date());
         appUser.setAppUserRoles(list);
-        String code = smsService.sendSms(signUpRequest.phoneNumber());
+        String code = smsService.sendSms(signUpRequest.phoneNumber().toString());
         appUser.setPassword(passwordEncoder.encode(signUpRequest.password()));
         appUser.setVerificationCode(code);
         userRepository.save(appUser);
@@ -83,7 +85,7 @@ public class UserService {
     @Transactional
     public ResponseObj verifyCode(VerifyUserRequest verifyUserRequest) {
         ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber());
+        AppUser appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber().toString());
         // CASE 0: SMS WAS NOT SENT TO PHONE NUMBER
         if (appUser == null || appUser.getVerificationCode() == null) {
             responseObj.setMessage("INVALID_CODE");
@@ -101,8 +103,8 @@ public class UserService {
         // CASE 2: SMS WAS SEND AND CODE IS CORRECT
         responseObj.setCode(ResponseStatus.ACCEPTED);
         responseObj.setMessage("REGISTRATION_CONFIRMED");
-        responseObj.setToken(jwtTokenProvider.createToken(verifyUserRequest.phoneNumber(),
-                                                          userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber())
+        responseObj.setToken(jwtTokenProvider.createToken(verifyUserRequest.phoneNumber().toString(),
+                                                          userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber().toString())
                                                               .getAppUserRoles()));
         // activate user (only registration)
         if (!appUser.isActive()) {
@@ -116,9 +118,9 @@ public class UserService {
 
     public ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
         ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber());
+        AppUser appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber().toString());
         if (appUser != null) {
-            String code = smsService.sendSms(phoneNumberRequest.phoneNumber());
+            String code = smsService.sendSms(phoneNumberRequest.phoneNumber().toString());
             appUser.setVerificationCode(code);
             userRepository.save(appUser);
             responseObj.setMessage("EMAIL_EXISTS");
@@ -132,7 +134,7 @@ public class UserService {
 
     public ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
         ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber());
+        AppUser appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber().toString());
         if (appUser != null) {
             if (appUser.getVerificationCode() != null && appUser.getVerificationCode().equals(newPasswordRequest.code())) {
                 appUser.setPassword(passwordEncoder.encode(newPasswordRequest.password()));

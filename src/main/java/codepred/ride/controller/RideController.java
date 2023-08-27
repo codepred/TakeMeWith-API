@@ -24,7 +24,7 @@ public class RideController {
     private final UserService userService;
     private final RideService rideService;
 
-    @PostMapping("/submit-ride'")
+    @PostMapping("/submit-ride")
     @ApiOperation(value = "${UserController.verifyCode}")
     @ApiResponses(value = {//
         @ApiResponse(code = 400, message = "Something went wrong"), //

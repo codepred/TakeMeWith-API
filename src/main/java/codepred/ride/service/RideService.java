@@ -7,6 +7,8 @@ import codepred.ride.dto.SubmitRideRequest;
 import codepred.ride.model.RideEntity;
 import codepred.ride.repository.RideRepository;
 import codepred.customer.service.UserService;
+import codepred.util.DateUtil;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,9 @@ public class RideService {
 
         rideEntity.setStart(submitRideRequest.start());
         rideEntity.setDestination(submitRideRequest.destination());
-        rideEntity.setStartDate(submitRideRequest.startDate());
+        rideEntity.setStartDate(DateUtil.convertStringToLocalDate(submitRideRequest.startDate()));
         rideEntity.setStartHour(submitRideRequest.startHour());
+        rideEntity.setCreatedAt(new Date());
         return rideRepository.save(rideEntity);
     }
 

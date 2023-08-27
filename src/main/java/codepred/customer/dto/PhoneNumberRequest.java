@@ -1,7 +1,7 @@
 package codepred.customer.dto;
 
 
-public record PhoneNumberRequest(String phoneNumber) {
+public record PhoneNumberRequest(Integer phoneNumber) {
 
 
 }

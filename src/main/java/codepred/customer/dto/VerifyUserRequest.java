@@ -1,4 +1,4 @@
 package codepred.customer.dto;
 
-public record VerifyUserRequest(String phoneNumber, String code) {
+public record VerifyUserRequest(Integer phoneNumber, Integer code) {
 }

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import javax.persistence.*;
 import java.util.Date;
 
+@Table(name = "RIDE")
 @Entity
 @Data
 @NoArgsConstructor
@@ -22,7 +23,7 @@ public class RideEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private AppUser appUser;
 
     private String start;

@@ -44,7 +44,7 @@ public class CustomerController {
         @ApiResponse(code = 400, message = "Something went wrong"), //
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> register(@RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByPhoneNumber(signUpRequest.phoneNumber())) {
+        if (userRepository.existsByPhoneNumber(signUpRequest.phoneNumber().toString())) {
             return ResponseEntity.status(400).body(new ResponseObj(ResponseStatus.BAD_REQUEST, "PHONE_NUMBER_IS_TAKEN", null));
         }
         userService.createNewUser(signUpRequest);
