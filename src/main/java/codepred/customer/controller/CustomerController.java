@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.annotations.Api;
@@ -96,7 +95,6 @@ public class CustomerController {
     }
 
     @GetMapping(value = "/get-user-data")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_NONE')")
     @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = {
         @Authorization(value = "apiKey")})
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Something went wrong"),
