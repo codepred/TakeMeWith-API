@@ -55,6 +55,10 @@ public class UserService {
             return new ResponseObj(UNAUTHORIZED, "WRONG_DATA", null);
         }
 
+        if (!appUser.isActive()){
+            return new ResponseObj(UNAUTHORIZED, "USER_NOT_VERIFIED", null);
+        }
+
         ResponseObj responseObj = new ResponseObj();
         responseObj.setCode(ResponseStatus.ACCEPTED);
         responseObj.setMessage("CORRECT_LOGIN_DATA");
