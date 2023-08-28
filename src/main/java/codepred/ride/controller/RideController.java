@@ -1,12 +1,8 @@
 package codepred.ride.controller;
 
-
 import codepred.customer.model.AppUser;
-import codepred.ride.dto.RideDataRequest;
 import codepred.ride.dto.SubmitRideRequest;
-import codepred.ride.repository.RideRepository;
 import codepred.ride.service.RideService;
-import codepred.customer.dto.ResponseObj;
 import codepred.customer.service.UserService;
 import io.swagger.annotations.*;
 import javax.servlet.http.HttpServletRequest;
@@ -46,15 +42,14 @@ public class RideController {
         return ResponseEntity.status(200).body(1);
     }
 
-    @PostMapping("/ride-list")
+    @PostMapping("/ride-list/{pageNumber}")
     @ApiOperation(value = "${UserController.verifyCode}")
     @ApiResponses(value = {
         @ApiResponse(code = 400, message = "Something went wrong"),
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-    public ResponseEntity<Object> rideList(@RequestBody RideDataRequest rideDataRequest, HttpServletRequest req) {
-        AppUser appUser = userService.whoami(req);
-        return ResponseEntity.status(200).body(rideService.getRideList(rideDataRequest));
+    public ResponseEntity<Object> rideList(@PathVariable Integer pageNumber) {
+        return ResponseEntity.status(200).body(rideService.getRideList(pageNumber));
     }
 
 }

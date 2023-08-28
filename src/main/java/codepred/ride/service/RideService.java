@@ -8,6 +8,7 @@ import codepred.ride.model.RideEntity;
 import codepred.ride.repository.RideRepository;
 import codepred.customer.service.UserService;
 import codepred.util.DateUtil;
+import io.swagger.models.auth.In;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,7 @@ public class RideService {
         return rideRepository.save(rideEntity);
     }
 
-    public List<RideResponse> getRideList(RideDataRequest rideDataRequest) {
+    public List<RideResponse> getRideList(Integer pageNumber) {
         List<RideEntity> rideEntities = rideRepository.findAll();
         return rideEntities.stream()
             .map(r -> new RideResponse(r.getId(),
