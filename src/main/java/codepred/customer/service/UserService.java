@@ -151,7 +151,7 @@ public class UserService {
         ResponseObj responseObj = new ResponseObj();
         AppUser appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber().toString());
         if (appUser != null) {
-            if (appUser.getVerificationCode() != null && appUser.getVerificationCode().equals(newPasswordRequest.code())) {
+            if (appUser.getVerificationCode() != null && appUser.getVerificationCode().equals(newPasswordRequest.code().toString())) {
                 appUser.setPassword(passwordEncoder.encode(newPasswordRequest.password()));
                 appUser.setVerificationCode(null);
                 userRepository.save(appUser);
