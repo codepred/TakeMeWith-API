@@ -1,29 +1,27 @@
 package codepred.customer.dto;
 
-import codepred.customer.model.AppUser;
 import java.util.List;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import codepred.customer.model.AppUserRole;
-import org.hibernate.annotations.Source;
 
 @Data
 public class UserResponseDTO {
 
-  @ApiModelProperty(position = 0)
+  @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private String name;
 
-  @ApiModelProperty(position = 1)
+  @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private String lastName;
 
-  @ApiModelProperty(position = 2)
+  @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private String phoneNUmber;
 
-  @ApiModelProperty(position = 3)
+  @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private String email;
 
-  @ApiModelProperty(position = 4)
+  @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private List<AppUserRole> appUserRoles;
 
 }

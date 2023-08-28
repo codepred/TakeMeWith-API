@@ -19,56 +19,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private final JwtTokenProvider jwtTokenProvider;
-
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-
-    // Disable CSRF (cross site request forgery)
-    http.csrf().disable();
-
-    // No session will be created or used by spring security
-    http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-    // Entry points
-//    http.httpBasic().and().
-//        authorizeRequests()
-//        .antMatchers("/users/signin").permitAll()//
-//        .antMatchers("/users/signup").permitAll()//
-//        .antMatchers("/users/list").permitAll()//
-//            .antMatchers("/ride/list").permitAll()//
-//        .antMatchers("/users/delete/*").permitAll()//
-//        .antMatchers("/users/verify").permitAll()//
-//        .antMatchers("/h2-console/**/**").permitAll()
-//            .antMatchers(HttpMethod.GET, "/users/list").permitAll()
-        // Disallow everything else..
-//        .anyRequest().authenticated();
-
-
-    // If a user try to access a resource without having enough permissions
-    http.exceptionHandling().accessDeniedPage("/login");
-
-    // Apply JWT
-    http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
-
-    // Optional, if you want to test the API from a browser
-    // http.httpBasic();
+    http.authorizeRequests()
+        .antMatchers("/swagger-ui.html").permitAll()
+        .anyRequest().authenticated()
+        .and().httpBasic();
   }
 
   @Override
   public void configure(WebSecurity web) throws Exception {
-    // Allow swagger to be accessed without authentication
-    web.ignoring().antMatchers("/v2/api-docs")//
-        .antMatchers("/swagger-resources/**")//
-        .antMatchers("/swagger-ui.html")//
-        .antMatchers("/configuration/**")//
-        .antMatchers("/webjars/**")//
-        .antMatchers("/public")
-
-        // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-        .and()
-        .ignoring()
-        .antMatchers("/h2-console/**/**");;
+    web.ignoring().antMatchers("/v2/api-docs",
+                               "/configuration/ui",
+                               "/swagger-resources/**",
+                               "/configuration/security",
+                               "/swagger-ui.html",
+                               "/webjars/**",
+                               "/**");
   }
 
   @Bean
