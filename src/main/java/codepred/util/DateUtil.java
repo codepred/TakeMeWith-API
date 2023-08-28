@@ -19,4 +19,9 @@ public class DateUtil {
         return localDate;
     }
 
+    public static String addLeadingZerosToDate(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+        return date.format(formatter);
+    }
+
 }

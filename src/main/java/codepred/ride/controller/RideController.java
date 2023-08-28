@@ -1,6 +1,8 @@
 package codepred.ride.controller;
 
+import codepred.customer.dto.ResponseObj;
 import codepred.customer.model.AppUser;
+import codepred.enums.ResponseStatus;
 import codepred.ride.dto.SubmitRideRequest;
 import codepred.ride.service.RideService;
 import codepred.customer.service.UserService;
@@ -11,8 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/customer")
-@Api(tags = "ride")
+@RequestMapping("/ride")
+@Api(tags = "rides")
 @RequiredArgsConstructor
 @CrossOrigin
 public class RideController {
@@ -28,7 +30,8 @@ public class RideController {
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> submitRide(@RequestBody SubmitRideRequest submitRideRequest, HttpServletRequest req) {
         AppUser appUser = userService.whoami(req);
-        return ResponseEntity.status(200).body(rideService.submitRide(submitRideRequest, appUser));
+        rideService.submitRide(submitRideRequest, appUser);
+        return ResponseEntity.status(200).body(new ResponseObj(ResponseStatus.OK, "RIDE_SUCCESSFULY_CREATED", null));
     }
 
     @GetMapping("/number-of-pages")

@@ -1,5 +1,7 @@
 package codepred.ride.service;
 
+import static codepred.util.DateUtil.addLeadingZerosToDate;
+
 import codepred.customer.model.AppUser;
 import codepred.ride.dto.RideDataRequest;
 import codepred.ride.dto.RideResponse;
@@ -38,12 +40,12 @@ public class RideService {
     }
 
     public List<RideResponse> getRideList(Integer pageNumber) {
-        List<RideEntity> rideEntities = rideRepository.findAll();
+        List<RideEntity> rideEntities = rideRepository.getAllMain();
         return rideEntities.stream()
             .map(r -> new RideResponse(r.getId(),
                                        r.getStart(),
                                        r.getDestination(),
-                                       r.getStartDate(),
+                                       addLeadingZerosToDate(r.getStartDate()),
                                        r.getStartHour(),
                                        r.getAppUser().getName(),
                                        r.getAppUser().getPhoneNumber(),
@@ -51,4 +53,5 @@ public class RideService {
                                        10))
             .collect(Collectors.toList());
     }
+
 }
