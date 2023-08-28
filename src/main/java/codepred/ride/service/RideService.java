@@ -50,7 +50,7 @@ public class RideService {
                                        r.getAppUser().getName(),
                                        r.getAppUser().getPhoneNumber(),
                                        "photo",
-                                       10))
+                                       null))
             .collect(Collectors.toList());
     }
 
