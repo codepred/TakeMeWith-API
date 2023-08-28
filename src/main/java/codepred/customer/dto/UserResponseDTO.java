@@ -16,7 +16,7 @@ public class UserResponseDTO {
   private String lastName;
 
   @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
-  private String phoneNUmber;
+  private String phoneNumber;
 
   @Schema(description = "code from backend", example = "1jbf31j4h3bt4jb12j4")
   private String email;
