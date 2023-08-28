@@ -14,6 +14,7 @@ import codepred.enums.ResponseStatus;
 import codepred.customer.model.AppUserRole;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,8 +65,12 @@ public class UserService {
     }
 
     @Transactional
-    public AppUser createNewUser(SignUpRequest signUpRequest) {
-        AppUser appUser = new AppUser();
+    public AppUser updateUser(SignUpRequest signUpRequest, AppUser appUser){
+        return setAppUserData(signUpRequest, appUser);
+    }
+
+    @NotNull
+    private AppUser setAppUserData(SignUpRequest signUpRequest, AppUser appUser) {
         appUser.setPhoneNumber(signUpRequest.phoneNumber().toString());
         appUser.setActive(false);
         appUser.setName(signUpRequest.name());
@@ -83,6 +88,12 @@ public class UserService {
     }
 
     @Transactional
+    public AppUser createNewUser(SignUpRequest signUpRequest) {
+        AppUser appUser = new AppUser();
+        return setAppUserData(signUpRequest, appUser);
+    }
+
+    @Transactional
     public ResponseObj verifyCode(VerifyUserRequest verifyUserRequest) {
         ResponseObj responseObj = new ResponseObj();
         AppUser appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber().toString());
@@ -94,7 +105,7 @@ public class UserService {
         }
         // CASE 1: SMS WAS SEND BUT CODE IS NOT CORRECT
         String verificationCode = appUser.getVerificationCode();
-        if (!verificationCode.equals(verifyUserRequest.code())) {
+        if (!verificationCode.equals(verifyUserRequest.code().toString())) {
             responseObj.setMessage("INVALID_CODE");
             responseObj.setCode(ResponseStatus.BAD_REQUEST);
             return responseObj;

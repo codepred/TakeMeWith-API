@@ -43,7 +43,7 @@ public class AppUser {
   @Column(name = "phone_number", unique = true, nullable = false)
   private String phoneNumber;
 
-  @Column(name = "email", unique = true, nullable = false)
+  @Column(name = "email", unique = false, nullable = false)
   private String email;
 
   @Size(min = 6, message = "Minimum password length: 6 characters")

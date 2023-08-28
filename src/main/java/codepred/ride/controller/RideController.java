@@ -26,9 +26,9 @@ public class RideController {
 
     @PostMapping("/submit-ride")
     @ApiOperation(value = "${UserController.verifyCode}")
-    @ApiResponses(value = {//
-        @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 403, message = "Access denied"), //
+    @ApiResponses(value = {
+        @ApiResponse(code = 400, message = "Something went wrong"),
+        @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> submitRide(@RequestBody SubmitRideRequest submitRideRequest, HttpServletRequest req) {
         AppUser appUser = userService.whoami(req);
@@ -37,9 +37,9 @@ public class RideController {
 
     @GetMapping("/number-of-pages")
     @ApiOperation(value = "${UserController.verifyCode}")
-    @ApiResponses(value = {//
-        @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 403, message = "Access denied"), //
+    @ApiResponses(value = {
+        @ApiResponse(code = 400, message = "Something went wrong"),
+        @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> numberOfPages(HttpServletRequest req) {
         AppUser appUser = userService.whoami(req);
@@ -48,9 +48,9 @@ public class RideController {
 
     @PostMapping("/ride-list")
     @ApiOperation(value = "${UserController.verifyCode}")
-    @ApiResponses(value = {//
-        @ApiResponse(code = 400, message = "Something went wrong"), //
-        @ApiResponse(code = 403, message = "Access denied"), //
+    @ApiResponses(value = {
+        @ApiResponse(code = 400, message = "Something went wrong"),
+        @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> rideList(@RequestBody RideDataRequest rideDataRequest, HttpServletRequest req) {
         AppUser appUser = userService.whoami(req);

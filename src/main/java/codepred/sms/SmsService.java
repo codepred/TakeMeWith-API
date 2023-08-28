@@ -1,5 +1,6 @@
 package codepred.sms;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,12 +19,14 @@ import java.util.Random;
 @Service
 public class SmsService {
 
+    @Value("${sms.token}")
+    private String smsToken;
     public String sendSms(String phone) {
-        String code = getRandomNumberString();
+        String code = "9" + getRandomNumberString();
         String url = "https://api.smsapi.pl/sms.do?";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authorization", "Bearer " + "kk379QzDPO8A4bQxhiIdWVokdeeDs0YWjUGqxewG");
+        headers.set("Authorization", "Bearer " + smsToken);
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
         map.add("from", "Takemewith");
@@ -38,12 +41,12 @@ public class SmsService {
     }
 
     public static String getRandomNumberString() {
-        // It will generate 6 digit random Number.
+        // It will generate 5 digit random Number.
         // from 0 to 999999
         Random rnd = new Random();
-        int number = rnd.nextInt(999999);
+        int number = rnd.nextInt(99999);
 
-        // this will convert any number sequence into 6 character.
-        return String.format("%06d", number);
+        // this will convert any number sequence into 5 character.
+        return String.format("%05d", number);
     }
 }
