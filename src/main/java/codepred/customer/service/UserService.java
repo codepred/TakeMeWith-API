@@ -15,6 +15,7 @@ import codepred.customer.model.AppUserRole;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -131,7 +132,8 @@ public class UserService {
         return responseObj;
     }
 
-    public final ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
+    @Transactional
+    public ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
         final var responseObj = new ResponseObj();
         final var appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber().toString());
         if (appUser != null) {
@@ -147,7 +149,8 @@ public class UserService {
         return responseObj;
     }
 
-    public final ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
+    @Transactional
+    public ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
         final var responseObj = new ResponseObj();
         final var appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber().toString());
         if (appUser != null) {

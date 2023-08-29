@@ -38,7 +38,6 @@ public class CustomerController {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    @Autowired
     private final UserRepository userRepository;
 
     @PostMapping("/sign-up")
@@ -115,7 +114,7 @@ public class CustomerController {
     public ResponseObj checkToken(HttpServletRequest req) {
         try {
             userService.whoami(req);
-        } catch (ExpiredJwtException e){
+        } catch (Exception e){
             return new ResponseObj(FORBIDDEN, "ACCESS_DENIED", null);
         }
         return new ResponseObj(ACCEPTED, "TOKEN_VALID", null);

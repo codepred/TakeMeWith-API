@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<AppUser, Integer> {
 
-  AppUser findByPhoneNumber(final String phone);
+  AppUser findByPhoneNumber(String phone);
 
 }

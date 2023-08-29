@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 import codepred.customer.repository.UserRepository;
 
 @Service
-@RequiredArgsConstructor
 public class MyUserDetails implements UserDetailsService {
 
   private final UserRepository userRepository;
+
+  public MyUserDetails(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @Override
   public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
