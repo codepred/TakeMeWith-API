@@ -1,13 +1,12 @@
 version: '3.3'
-
 services:
   app:
-    image: openjdk:11-jre-slim
-    container_name: takemewith-backend
+    image: openjdk:17
+    container_name: takeme-backend
     ports:
-      - "2002:2002"
+      - "8089:8089"
     volumes:
-      - ./target/jwt-auth-service-1.0.0.jar:/target/jwt-auth-service-1.0.0.jar
+      - ./target/takemewith-1.0.0.jar:/target/takemewith-1.0.0.jar
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/take?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: jacek
@@ -15,19 +14,17 @@ services:
       SPRING_JPA_DATABASE-PLATFORM: org.hibernate.dialect.MySQL8Dialect
     depends_on:
       - docker-mysql
-    command: java -jar /target/jwt-auth-service-1.0.0.jar
+    command: java -jar /target/takemewith-1.0.0.jar
     # Service health check
     healthcheck:
-      test: curl -f http://localhost:8080/profile || exit 1
+      test: curl -f http://localhost:8089/profile || exit 1
       interval: 1m
       timeout: 10s
       retries: 2
 
-
-
   docker-mysql:
     image: mysql:8.0
-    container_name: takemewith-mysql-db
+    container_name: takemewith-mysql
     ports:
       - "3307:3306"
     environment:
@@ -35,8 +32,6 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: take
-#    volumes:
-#      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres
       interval: 1m
