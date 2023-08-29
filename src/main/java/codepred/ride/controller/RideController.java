@@ -28,8 +28,8 @@ public class RideController {
         @ApiResponse(code = 400, message = "Something went wrong"),
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-    public ResponseEntity<Object> submitRide(@RequestBody SubmitRideRequest submitRideRequest, HttpServletRequest req) {
-        AppUser appUser = userService.whoami(req);
+    public ResponseEntity<Object> submitRide(@RequestBody final SubmitRideRequest submitRideRequest, final HttpServletRequest req) {
+        final var appUser = userService.whoami(req);
         rideService.submitRide(submitRideRequest, appUser);
         return ResponseEntity.status(200).body(new ResponseObj(ResponseStatus.OK, "RIDE_SUCCESSFULY_CREATED", null));
     }
@@ -40,8 +40,8 @@ public class RideController {
         @ApiResponse(code = 400, message = "Something went wrong"),
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-    public ResponseEntity<Object> numberOfPages(HttpServletRequest req) {
-        AppUser appUser = userService.whoami(req);
+    public ResponseEntity<Object> numberOfPages(final HttpServletRequest req) {
+        final var appUser = userService.whoami(req);
         return ResponseEntity.status(200).body(1);
     }
 
@@ -51,7 +51,7 @@ public class RideController {
         @ApiResponse(code = 400, message = "Something went wrong"),
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
-    public ResponseEntity<Object> rideList(@PathVariable Integer pageNumber) {
+    public ResponseEntity<Object> rideList(@PathVariable final Integer pageNumber) {
         return ResponseEntity.status(200).body(rideService.getRideList(pageNumber));
     }
 

@@ -19,7 +19,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 @Table(name = "USERS")
 @Entity
-@Data // Create getters and setters
+@Data
 @NoArgsConstructor
 public class AppUser {
 

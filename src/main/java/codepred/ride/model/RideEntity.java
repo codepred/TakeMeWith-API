@@ -17,6 +17,7 @@ public class RideEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @CreatedDate
@@ -26,12 +27,16 @@ public class RideEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     private AppUser appUser;
 
+    @Column(name = "start")
     private String start;
 
+    @Column(name = "destination")
     private String destination;
 
+    @Column(name = "start_date")
     private LocalDate startDate;
 
+    @Column(name = "start_hour")
     private String startHour;
 
 }

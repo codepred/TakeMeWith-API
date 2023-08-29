@@ -27,8 +27,8 @@ public class RideService {
     @Autowired
     RideRepository rideRepository;
 
-    public RideEntity submitRide(SubmitRideRequest submitRideRequest, AppUser appUser) {
-        RideEntity rideEntity = new RideEntity();
+    public RideEntity submitRide(final SubmitRideRequest submitRideRequest, final AppUser appUser) {
+        final var rideEntity = new RideEntity();
         rideEntity.setAppUser(appUser);
 
         rideEntity.setStart(submitRideRequest.start());
@@ -39,7 +39,7 @@ public class RideService {
         return rideRepository.save(rideEntity);
     }
 
-    public List<RideResponse> getRideList(Integer pageNumber) {
+    public List<RideResponse> getRideList(final Integer pageNumber) {
         List<RideEntity> rideEntities = rideRepository.getAllMain();
         return rideEntities.stream()
             .map(r -> new RideResponse(r.getId(),

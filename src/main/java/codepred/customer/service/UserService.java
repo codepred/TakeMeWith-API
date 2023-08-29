@@ -43,7 +43,7 @@ public class UserService {
 
     @Transactional
     public ResponseObj signin(SignInRequest signInRequest) {
-        AppUser appUser = userRepository.findByPhoneNumber(signInRequest.phoneNumber().toString());
+        final var appUser = userRepository.findByPhoneNumber(signInRequest.phoneNumber().toString());
         if (appUser == null) {
             return new ResponseObj(BAD_REQUEST, "USER_NOT_EXISTS", null);
         }
@@ -59,7 +59,7 @@ public class UserService {
             return new ResponseObj(UNAUTHORIZED, "USER_NOT_VERIFIED", null);
         }
 
-        ResponseObj responseObj = new ResponseObj();
+        final var responseObj = new ResponseObj();
         responseObj.setCode(ResponseStatus.ACCEPTED);
         responseObj.setMessage("CORRECT_LOGIN_DATA");
         responseObj.setToken(jwtTokenProvider.createToken(signInRequest.phoneNumber().toString(),
@@ -93,14 +93,14 @@ public class UserService {
 
     @Transactional
     public AppUser createNewUser(SignUpRequest signUpRequest) {
-        AppUser appUser = new AppUser();
+        final var appUser = new AppUser();
         return setAppUserData(signUpRequest, appUser);
     }
 
     @Transactional
     public ResponseObj verifyCode(VerifyUserRequest verifyUserRequest) {
-        ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber().toString());
+        final var responseObj = new ResponseObj();
+        final var appUser = userRepository.findByPhoneNumber(verifyUserRequest.phoneNumber().toString());
         // CASE 0: SMS WAS NOT SENT TO PHONE NUMBER
         if (appUser == null || appUser.getVerificationCode() == null) {
             responseObj.setMessage("INVALID_CODE");
@@ -131,9 +131,9 @@ public class UserService {
         return responseObj;
     }
 
-    public ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
-        ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber().toString());
+    public final ResponseObj requestNewPassword(PhoneNumberRequest phoneNumberRequest) {
+        final var responseObj = new ResponseObj();
+        final var appUser = userRepository.findByPhoneNumber(phoneNumberRequest.phoneNumber().toString());
         if (appUser != null) {
             String code = smsService.sendSms(phoneNumberRequest.phoneNumber().toString());
             appUser.setVerificationCode(code);
@@ -147,9 +147,9 @@ public class UserService {
         return responseObj;
     }
 
-    public ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
-        ResponseObj responseObj = new ResponseObj();
-        AppUser appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber().toString());
+    public final ResponseObj setNewPassword(NewPasswordRequest newPasswordRequest) {
+        final var responseObj = new ResponseObj();
+        final var appUser = userRepository.findByPhoneNumber(newPasswordRequest.phoneNumber().toString());
         if (appUser != null) {
             if (appUser.getVerificationCode() != null && appUser.getVerificationCode().equals(newPasswordRequest.code().toString())) {
                 appUser.setPassword(passwordEncoder.encode(newPasswordRequest.password()));
@@ -157,20 +157,18 @@ public class UserService {
                 userRepository.save(appUser);
                 responseObj.setCode(ResponseStatus.ACCEPTED);
                 responseObj.setMessage("CORRECT_DATA");
-                return responseObj;
             } else {
                 responseObj.setCode(BAD_REQUEST);
                 responseObj.setMessage("INVALID_CODE");
-                return responseObj;
             }
+            return responseObj;
         }
         responseObj.setMessage("INVALID_PHONE_NUMBER");
         responseObj.setCode(BAD_REQUEST);
         return responseObj;
     }
 
-
-    public Integer getResponseCode(ResponseStatus code) {
+    public final Integer getResponseCode(ResponseStatus code) {
         if (code.equals(ResponseStatus.ACCEPTED)) {
             return 200;
         } else if (code.equals(ResponseStatus.BAD_REQUEST)) {
@@ -185,7 +183,7 @@ public class UserService {
         return userRepository.findByPhoneNumber(jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(req)));
     }
 
-    public String refresh(String username) {
+    public final String refresh(String username) {
         return jwtTokenProvider.createToken(username, userRepository.findByPhoneNumber(username).getAppUserRoles());
     }
 

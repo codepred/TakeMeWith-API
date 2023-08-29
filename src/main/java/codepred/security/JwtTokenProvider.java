@@ -36,7 +36,7 @@ public class JwtTokenProvider {
   private String secretKey;
 
   @Value("${security.jwt.token.expire-length:3600000}")
-  private long validityInMilliseconds = 3600000; // 1h
+  private final long validityInMilliseconds = 3600000; // 1h
 
   @Autowired
   private MyUserDetails myUserDetails;
@@ -46,13 +46,13 @@ public class JwtTokenProvider {
     secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
   }
 
-  public String createToken(String username, List<AppUserRole> appUserRoles) {
+  public final String createToken(final String username, final List<AppUserRole> appUserRoles) {
 
-    Claims claims = Jwts.claims().setSubject(username);
+    final var claims = Jwts.claims().setSubject(username);
     claims.put("auth", appUserRoles.stream().map(s -> new SimpleGrantedAuthority(s.getAuthority())).filter(Objects::nonNull).collect(Collectors.toList()));
 
-    Date now = new Date();
-    Date validity = new Date(now.getTime() + validityInMilliseconds);
+    final var now = new Date();
+    final var validity = new Date(now.getTime() + validityInMilliseconds);
 
     return Jwts.builder()//
         .setClaims(claims)//
@@ -62,17 +62,17 @@ public class JwtTokenProvider {
         .compact();
   }
 
-  public Authentication getAuthentication(String token) {
+  public final Authentication getAuthentication(final String token) {
     UserDetails userDetails = myUserDetails.loadUserByUsername(getUsername(token));
     return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
   }
 
-  public String getUsername(String token) {
+  public final String getUsername(String token) {
     return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
   }
 
   public String resolveToken(HttpServletRequest req) {
-    String bearerToken = req.getHeader("Authorization");
+    final var bearerToken = req.getHeader("Authorization");
     if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }

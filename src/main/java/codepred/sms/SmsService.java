@@ -1,5 +1,7 @@
 package codepred.sms;
 
+import static codepred.util.NumberUtil.getRandomNumberString;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +23,10 @@ public class SmsService {
 
     @Value("${sms.token}")
     private String smsToken;
-    public String sendSms(String phone) {
-        String code = "9" + getRandomNumberString();
-        String url = "https://api.smsapi.pl/sms.do?";
-        HttpHeaders headers = new HttpHeaders();
+    public String sendSms(final String phone) {
+        final var code = "9" + getRandomNumberString();
+        final var url = "https://api.smsapi.pl/sms.do?";
+        final var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "Bearer " + smsToken);
         RestTemplate restTemplate = new RestTemplate();
@@ -40,13 +42,4 @@ public class SmsService {
         return code;
     }
 
-    public static String getRandomNumberString() {
-        // It will generate 5 digit random Number.
-        // from 0 to 999999
-        Random rnd = new Random();
-        int number = rnd.nextInt(99999);
-
-        // this will convert any number sequence into 5 character.
-        return String.format("%05d", number);
-    }
 }

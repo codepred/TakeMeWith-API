@@ -6,6 +6,7 @@ public enum ResponseStatus {
     BAD_REQUEST,
     SERVER_ERROR,
     UNAUTHORIZED,
-    OK;
+    OK,
+    FORBIDDEN;
 
 }

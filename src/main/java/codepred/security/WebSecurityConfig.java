@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
-  protected void configure(HttpSecurity http) throws Exception {
+  protected void configure(final HttpSecurity http) throws Exception {
     http.authorizeRequests()
         .antMatchers("/swagger-ui.html").permitAll()
         .anyRequest().authenticated()
@@ -28,7 +28,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   @Override
-  public void configure(WebSecurity web) throws Exception {
+  public void configure(final WebSecurity web) throws Exception {
     web.ignoring().antMatchers("/v2/api-docs",
                                "/configuration/ui",
                                "/swagger-resources/**",

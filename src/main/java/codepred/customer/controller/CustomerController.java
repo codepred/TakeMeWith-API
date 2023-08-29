@@ -1,5 +1,8 @@
 package codepred.customer.controller;
 
+import static codepred.enums.ResponseStatus.ACCEPTED;
+import static codepred.enums.ResponseStatus.FORBIDDEN;
+
 import codepred.customer.dto.NewPasswordRequest;
 import codepred.customer.dto.PhoneNumberRequest;
 import codepred.customer.dto.ResponseObj;
@@ -7,6 +10,7 @@ import codepred.customer.dto.SignInRequest;
 import codepred.customer.dto.SignUpRequest;
 import codepred.enums.ResponseStatus;
 import codepred.customer.dto.VerifyUserRequest;
+import io.jsonwebtoken.ExpiredJwtException;
 import javax.servlet.http.HttpServletRequest;
 
 import codepred.customer.repository.UserRepository;
@@ -52,7 +56,7 @@ public class CustomerController {
         else{
             userService.createNewUser(signUpRequest);
         }
-        return ResponseEntity.status(200).body(new ResponseObj(ResponseStatus.ACCEPTED, "DATA_SUCCESFULY_ADDED", null));
+        return ResponseEntity.status(200).body(new ResponseObj(ACCEPTED, "DATA_SUCCESFULY_ADDED", null));
     }
 
     @PostMapping("/sign-in")
@@ -103,4 +107,17 @@ public class CustomerController {
         return modelMapper.map(userService.whoami(req), UserResponseDTO.class);
     }
 
+    @GetMapping(value = "/login-check")
+    @ApiOperation(value = "${UserController.me}", response = UserResponseDTO.class, authorizations = {
+        @Authorization(value = "apiKey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Something went wrong"),
+        @ApiResponse(code = 403, message = "Access denied"), @ApiResponse(code = 500, message = "Expired or invalid JWT token")})
+    public ResponseObj checkToken(HttpServletRequest req) {
+        try {
+            userService.whoami(req);
+        } catch (ExpiredJwtException e){
+            return new ResponseObj(FORBIDDEN, "ACCESS_DENIED", null);
+        }
+        return new ResponseObj(ACCEPTED, "TOKEN_VALID", null);
+    }
 }
