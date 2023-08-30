@@ -1,39 +1,45 @@
-version: '3.3'
+version: '3.7'
 services:
-  app:
-    image: openjdk:17
-    container_name: takeme-backend
-    ports:
-      - "8089:8089"
-    volumes:
-      - ./target/takemewith-1.0.0.jar:/target/takemewith-1.0.0.jar
+  takemewith-backend:
+    image: takemewith-backend:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: takemewith-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://docker-mysql:3306/take?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://takemewith-mysql:3306/take?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: jacek
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_DATABASE-PLATFORM: org.hibernate.dialect.MySQL8Dialect
     depends_on:
-      - docker-mysql
-    command: java -jar /target/takemewith-1.0.0.jar
-    # Service health check
-    healthcheck:
-      test: curl -f http://localhost:8089/profile || exit 1
-      interval: 1m
-      timeout: 10s
-      retries: 2
+      - mysql
+    networks:
+      - takemewith-net
+    restart: unless-stopped
 
-  docker-mysql:
+  mysql:
     image: mysql:8.0
     container_name: takemewith-mysql
     ports:
-      - "3307:3306"
+      - "3307:3306" # It SHOULD be hermetized!
     environment:
       MYSQL_USER: jacek
       MYSQL_ROOT_PASSWORD: password
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: take
+    volumes:
+      - takemewith-mysql-data:/var/lib/mysql
+    networks:
+      - takemewith-net
     healthcheck:
-      test: pg_isready -U postgres
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
       interval: 1m
       timeout: 10s
       retries: 2
+
+volumes:
+  takemewith-mysql-data:
+
+networks:
+  takemewith-net:
+    name: takemewith-net

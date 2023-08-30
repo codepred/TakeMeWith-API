@@ -1,5 +1,6 @@
 package codepred.ride.controller;
 
+import codepred.counter.CounterService;
 import codepred.customer.dto.ResponseObj;
 import codepred.customer.model.AppUser;
 import codepred.enums.ResponseStatus;
@@ -21,6 +22,7 @@ public class RideController {
 
     private final UserService userService;
     private final RideService rideService;
+    private final CounterService counterService;
 
     @PostMapping("/submit-ride")
     @ApiOperation(value = "${UserController.verifyCode}")
@@ -52,6 +54,7 @@ public class RideController {
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> rideList(@PathVariable final Integer pageNumber) {
+        counterService.increaseCounter();
         return ResponseEntity.status(200).body(rideService.getRideList(pageNumber));
     }
 

@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-public class RideEntity {
+public class Ride {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,14 +3,12 @@ package codepred.ride.service;
 import static codepred.util.DateUtil.addLeadingZerosToDate;
 
 import codepred.customer.model.AppUser;
-import codepred.ride.dto.RideDataRequest;
 import codepred.ride.dto.RideResponse;
 import codepred.ride.dto.SubmitRideRequest;
-import codepred.ride.model.RideEntity;
+import codepred.ride.model.Ride;
 import codepred.ride.repository.RideRepository;
 import codepred.customer.service.UserService;
 import codepred.util.DateUtil;
-import io.swagger.models.auth.In;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,8 +25,8 @@ public class RideService {
     @Autowired
     RideRepository rideRepository;
 
-    public RideEntity submitRide(final SubmitRideRequest submitRideRequest, final AppUser appUser) {
-        final var rideEntity = new RideEntity();
+    public Ride submitRide(final SubmitRideRequest submitRideRequest, final AppUser appUser) {
+        final var rideEntity = new Ride();
         rideEntity.setAppUser(appUser);
 
         rideEntity.setStart(submitRideRequest.start());
@@ -40,7 +38,7 @@ public class RideService {
     }
 
     public List<RideResponse> getRideList(final Integer pageNumber) {
-        List<RideEntity> rideEntities = rideRepository.getAllMain();
+        List<Ride> rideEntities = rideRepository.getAllMain();
         return rideEntities.stream()
             .map(r -> new RideResponse(r.getId(),
                                        r.getStart(),
