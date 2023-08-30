@@ -27,6 +27,10 @@ public class CounterController {
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> numberOfPages() {
+        if(counterRepository.findAll().size() == 0){
+            counterRepository.save(new Counter());
+        }
+
         return ResponseEntity.status(200).body(counterRepository.findAll().get(0).getCounter());
     }
 }

@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CounterService {
 
-
     private final CounterRepository counterRepository;
 
     public CounterService(CounterRepository counterRepository) {

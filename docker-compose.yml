@@ -11,7 +11,6 @@ services:
       SPRING_DATASOURCE_USERNAME: jacek
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_DATABASE-PLATFORM: org.hibernate.dialect.MySQL8Dialect
-      JASYPT_ENCRYPTOR_PASSWORD: :${JASYPT_ENCRYPTOR_PASSWORD}
     depends_on:
       - mysql
     networks:
@@ -22,7 +21,7 @@ services:
     image: mysql:8.0
     container_name: takemewith-mysql
     ports:
-      - "3307:3306"
+      - "3307:3306" # It SHOULD be hermetized!
     environment:
       MYSQL_USER: jacek
       MYSQL_ROOT_PASSWORD: password
@@ -44,3 +43,4 @@ volumes:
 networks:
   takemewith-net:
     name: takemewith-net
+

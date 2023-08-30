@@ -20,5 +20,5 @@ public class Counter {
     @Column(name = "id")
     private Integer id;
 
-    private Integer counter;
+    private Integer counter = 0;
 }
