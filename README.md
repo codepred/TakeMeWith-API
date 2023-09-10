@@ -15,5 +15,6 @@ https://api.takemewith.pl/swagger-ui/index.html#
 **Our Website:**
 https://codepred.com/
 
-For more information contact us:
+**For more information contact us:**
+
 codepredpoznan@gmail.com
