@@ -43,4 +43,5 @@ volumes:
 networks:
   takemewith-net:
     name: takemewith-net
+    external: true
 

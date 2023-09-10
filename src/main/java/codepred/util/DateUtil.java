@@ -5,22 +5,18 @@ import java.time.format.DateTimeFormatter;
 
 public class DateUtil {
 
-    public static LocalDate convertStringToLocalDate(String dateString){
-
-        // Define the pattern that matches the format of the input string
-        String pattern = "yyyy-MM-dd";
-
-        // Create a DateTimeFormatter using the pattern
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-
-        // Parse the string into a LocalDate object
-        LocalDate localDate = LocalDate.parse(dateString, formatter);
-
-        return localDate;
+    private DateUtil() {
     }
 
-    public static String addLeadingZerosToDate(LocalDate date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+    public static LocalDate convertStringToLocalDate(final String dateString){
+        final var pattern = "yyyy-MM-dd";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        return LocalDate.parse(dateString, formatter);
+    }
+
+    public static String addLeadingZerosToDate(final LocalDate date) {
+        final var pattern = "dd/MM";
+        final var formatter = DateTimeFormatter.ofPattern(pattern);
         return date.format(formatter);
     }
 

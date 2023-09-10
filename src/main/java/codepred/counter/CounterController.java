@@ -20,14 +20,14 @@ public class CounterController {
 
     private final CounterRepository counterRepository;
 
-    @GetMapping()
+    @GetMapping
     @ApiOperation(value = "${UserController.verifyCode}")
     @ApiResponses(value = {
         @ApiResponse(code = 400, message = "Something went wrong"),
         @ApiResponse(code = 403, message = "Access denied"),
         @ApiResponse(code = 422, message = "Invalid username/password supplied")})
     public ResponseEntity<Object> numberOfPages() {
-        if(counterRepository.findAll().size() == 0){
+        if(counterRepository.findAll().isEmpty()){
             counterRepository.save(new Counter());
         }
 
