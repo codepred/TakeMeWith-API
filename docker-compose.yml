@@ -21,12 +21,7 @@ services:
     image: mysql:8.0
     container_name: takemewith-mysql
     ports:
-      - "3307:3306" # It SHOULD be hermetized!
-    environment:
-      MYSQL_USER: jacek
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: take
+      - "3307:3306"
     volumes:
       - takemewith-mysql-data:/var/lib/mysql
     networks:
@@ -43,5 +38,4 @@ volumes:
 networks:
   takemewith-net:
     name: takemewith-net
-    external: true
 
